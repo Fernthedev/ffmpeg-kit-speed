@@ -90,7 +90,7 @@ jobs:
           cd ${GITHUB_WORKSPACE}
 
           export ANDROID_HOME=~/.android/sdk
-          export ANDROID_NDK_ROOT=<ndkpath.txt
+          export ANDROID_NDK_ROOT=./ndk
 
           chmod +x ./finalBuild.sh
           ./finalBuild.sh
