@@ -94,6 +94,12 @@ jobs:
 
           chmod +x ./finalBuild.sh
           ./finalBuild.sh
+      - name: The job has failed Build.log
+        if: ${{ failure() }}
+        run: |
+          cat "build.log"
+          ls .
+
       - name: Upload non-debug artifact
         uses: actions/upload-artifact@v2
         with:
