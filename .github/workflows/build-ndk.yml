@@ -18,7 +18,7 @@ jobs:
         with:
           submodules: true
           lfs: true
-          fetch-depth: '0'
+          fetch-depth: "0"
       - name: Install Powershell
         run: sudo apt-get install -y powershell
 
@@ -92,6 +92,8 @@ jobs:
 
           # export ANDROID_HOME=~/.android/sdk
           export ANDROID_NDK_ROOT=$(cat ndkpath.txt)
+
+          sudo apt install -y autotools-dev automake
 
           chmod +x ./finalBuild.sh
           ./finalBuild.sh
