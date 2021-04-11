@@ -97,8 +97,8 @@ jobs:
       - name: The job has failed Build.log
         if: ${{ failure() }}
         run: |
-          cat "build.log"
-          ls .
+          cat "mobile-ffmpeg/build.log"
+          ls ./mobile-ffmpeg
 
       - name: Upload non-debug artifact
         uses: actions/upload-artifact@v2
