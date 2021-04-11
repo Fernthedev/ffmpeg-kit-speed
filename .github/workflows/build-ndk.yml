@@ -107,5 +107,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Prebuilt directory
-          path: ./prebuilt/
+          path: ./mobile-ffmpeg/prebuilt/
           if-no-files-found: error
