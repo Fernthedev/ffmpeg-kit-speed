@@ -19,34 +19,34 @@ jobs:
           submodules: true
           lfs: true
           fetch-depth: "0"
-      - name: Install Powershell
-        run: sudo apt-get install -y powershell
+      # - name: Install Powershell
+      #   run: sudo apt-get install -y powershell
 
-      - name: Cache Android NDK
-        id: cache-ndk
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-ndk
-          ndkname: android-ndk-r21
-        with:
-          path: ndk
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+      # - name: Cache Android NDK
+      #   id: cache-ndk
+      #   uses: actions/cache@v2
+      #   env:
+      #     cache-name: cache-ndk
+      #     ndkname: android-ndk-r21
+      #   with:
+      #     path: ndk
+      #     key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
 
-      - name: Install Android NDK
-        if: steps.cache-ndk.outputs.cache-hit != 'true'
-        env:
-          ndkname: android-ndk-r21
-        run: |
-          wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
-          unzip -q ndk.zip
-          mv ${ndkname} ndk
+      # - name: Install Android NDK
+      #   if: steps.cache-ndk.outputs.cache-hit != 'true'
+      #   env:
+      #     ndkname: android-ndk-r21
+      #   run: |
+      #     wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
+      #     unzip -q ndk.zip
+      #     mv ${ndkname} ndk
 
-      - name: Create ndkpath.txt
-        run: |
-          cd ndk
-          pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
+      # - name: Create ndkpath.txt
+      #   run: |
+      #     cd ndk
+      #     pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
@@ -91,7 +91,8 @@ jobs:
           cd ${GITHUB_WORKSPACE}
 
           # export ANDROID_HOME=~/.android/sdk
-          export ANDROID_NDK_ROOT=$(cat ndkpath.txt)
+          $ANDROID_HOME/tools/bin/sdkmanager --install "ndk;21.3.6528147"
+          export ANDROID_NDK_ROOT=$($ANDROID_HOME/ndk/21.3.6528147)
 
           sudo apt install -y autotools-dev automake pkg-config autogen gperf
 
