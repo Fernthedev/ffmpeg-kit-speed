@@ -93,7 +93,7 @@ jobs:
           # export ANDROID_HOME=~/.android/sdk
           export ANDROID_NDK_ROOT=$(cat ndkpath.txt)
 
-          sudo apt install -y autotools-dev automake pkg-config autogen
+          sudo apt install -y autotools-dev automake pkg-config autogen gperf
 
           chmod +x ./finalBuild.sh
           ./finalBuild.sh
