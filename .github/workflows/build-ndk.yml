@@ -19,6 +19,13 @@ jobs:
           submodules: true
           lfs: true
           fetch-depth: "0"
+      - name: Cache Android and binaries
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/Android
+            ./mobile-ffmpeg/prebuilt
+          key: ${{ runner.os }}-android
       # - name: Install Powershell
       #   run: sudo apt-get install -y powershell
 
