@@ -98,22 +98,22 @@ jobs:
           cd ${GITHUB_WORKSPACE}
 
           # export ANDROID_HOME=~/.android/sdk
-          $ANDROID_HOME/tools/bin/sdkmanager --install "ndk;21.3.6528147" 2>&1 > /dev/null
-          export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/21.3.6528147
+          $ANDROID_HOME/tools/bin/sdkmanager --install "ndk;22.1.7171670" 2>&1 > /dev/null
+          export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/22.1.7171670
 
-          sudo apt install -y autotools-dev automake pkg-config autogen gperf
+          sudo apt install -y autotools-dev automake pkg-config autogen gperf autoconf libtool curl git cmake gcc gperf texinfo yasm nasm bison autogen wget autopoint meson ninja
 
           chmod +x ./finalBuild.sh
           ./finalBuild.sh
       - name: The job has failed Build.log
         if: ${{ failure() }}
         run: |
-          cat "mobile-ffmpeg/build.log"
-          ls ./mobile-ffmpeg
+          cat "ffmpeg-kit/build.log"
+          ls ./ffmpeg-kit
 
       - name: Upload non-debug artifact
         uses: actions/upload-artifact@v2
         with:
           name: Prebuilt directory
-          path: ./mobile-ffmpeg/prebuilt/
+          path: ./ffmpeg-kit/prebuilt/
           if-no-files-found: error
