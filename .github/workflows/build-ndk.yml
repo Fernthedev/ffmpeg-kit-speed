@@ -2,9 +2,8 @@ name: NDK build
 
 on:
   push:
-    branches: master
-  pull_request:
-    branches: master
+    tags:
+      - "v*"
 
 jobs:
   build:
@@ -107,15 +106,74 @@ jobs:
 
           chmod +x ./finalBuild.sh
           ./finalBuild.sh
+
       - name: The job has failed Build.log
         if: ${{ failure() }}
         run: |
           cat "ffmpeg-kit/build.log"
           ls ./ffmpeg-kit
 
-      - name: Upload non-debug artifact
-        uses: actions/upload-artifact@v2
+      - name: Get Tag Version
+        id: get_tag_version
+        run: |
+          echo ${GITHUB_REF#refs/tags/}
+          echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
+          echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
+
+      # Get release that was created for this tag
+      - name: Get Release
+        uses: octokit/request-action@v2.x
+        id: get_release
         with:
-          name: Prebuilt directory
-          path: ./ffmpeg-kit/prebuilt/
-          if-no-files-found: error
+          route: GET /repos/:repository/releases/tags/${{ steps.get_tag_version.outputs.TAG }}
+          repository: ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Release Upload URL
+        id: get_upload_url
+        run: |
+          url=$(echo "$response" | jq -r '.upload_url')
+          echo $url
+          echo "::set-output name=upload_url::$url"
+        env:
+          response: ${{ steps.get_release.outputs.data }}
+
+      # Upload our release assets
+      - name: Upload headers Release Asset
+        id: upload_release_headers_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+          asset_path: ./ffmpeg-kit/prebuilt/android-arm64/ffmpeg/include
+          asset_name: ffmpeg-kit-headers.zip
+          asset_content_type: application/octet-stream
+
+      - name: Upload prebuilt folder release Asset
+        id: upload_release_headers_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+          asset_path: ./ffmpeg-kit/prebuilt/
+          asset_name: Prebuilt.zip
+          asset_content_type: application/octet-stream
+
+      # Upload our release assets
+      - name: Upload libraries Release Asset
+        id: upload_release_libraries_asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            ./ffmpeg-kit/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar
+      # - name: Upload non-debug artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: Prebuilt directory
+      #     path: ./ffmpeg-kit/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar
+      #     if-no-files-found: error
