@@ -146,13 +146,13 @@ jobs:
           sudo apt install zip
           
           echo header zip
-          rm -r ./include
+          rm -rf ./include
           mv ./ffmpeg-kit/prebuilt/android-arm64/ffmpeg/include ./include
           zip -r ffmpeg-kit-headers.zip ./include
 
           
           echo prebuilt zip
-          rm -r ./prebuilt
+          rm -rf ./prebuilt
           mv ./ffmpeg-kit/prebuilt/ ./prebuilt
           zip -r Prebuilt.zip ./prebuilt/
           
