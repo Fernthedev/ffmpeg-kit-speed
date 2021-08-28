@@ -149,6 +149,10 @@ jobs:
           zip -q ffmpeg-kit-headers.zip ./ffmpeg-kit/prebuilt/android-arm64/ffmpeg/include
           echo prebuilt zip
           zip -q Prebuilt ./ffmpeg-kit/prebuilt/
+          
+          ls
+          echo other folder
+          ls ./ffmpeg-kit
 
       # Upload our release assets
       - name: Upload headers Release Asset
@@ -158,7 +162,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
-          asset_path: ${GITHUB_WORKSPACE}/ffmpeg-kit-headers.zip
+          asset_path: ./ffmpeg-kit-headers.zip
           asset_name: ffmpeg-kit-headers.zip
           asset_content_type: application/octet-stream
 
@@ -169,7 +173,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
-          asset_path: ${GITHUB_WORKSPACE}/Prebuilt.zip
+          asset_path: ./Prebuilt.zip
           asset_name: Prebuilt.zip
           asset_content_type: application/octet-stream
 
