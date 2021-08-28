@@ -146,9 +146,15 @@ jobs:
           sudo apt install zip
           
           echo header zip
-          zip ffmpeg-kit-headers.zip ./ffmpeg-kit/prebuilt/android-arm64/ffmpeg/include
+          rm -r ./include
+          mv ./ffmpeg-kit/prebuilt/android-arm64/ffmpeg/include ./include
+          zip -r ffmpeg-kit-headers.zip ./include
+
+          
           echo prebuilt zip
-          zip Prebuilt.zip ./ffmpeg-kit/prebuilt/
+          rm -r ./prebuilt
+          mv ./ffmpeg-kit/prebuilt/ ./prebuilt
+          zip -r Prebuilt.zip ./prebuilt/
           
           ls
           echo other folder
