@@ -138,27 +138,38 @@ jobs:
           echo "::set-output name=upload_url::$url"
         env:
           response: ${{ steps.get_release.outputs.data }}
+          
+      - name: Zip
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          
+          sudo apt install zip
+          
+          echo header zip
+          zip -q ffmpeg-kit-headers.zip ./ffmpeg-kit/prebuilt/android-arm64/ffmpeg/include
+          echo prebuilt zip
+          zip -q Prebuilt ./ffmpeg-kit/prebuilt/
 
       # Upload our release assets
       - name: Upload headers Release Asset
         id: upload_release_headers_asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
-          asset_path: ./ffmpeg-kit/prebuilt/android-arm64/ffmpeg/include
+          asset_path: ${GITHUB_WORKSPACE}/ffmpeg-kit-headers.zip
           asset_name: ffmpeg-kit-headers.zip
           asset_content_type: application/octet-stream
 
       - name: Upload prebuilt folder release Asset
         id: upload_release_folder_asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
-          asset_path: ./ffmpeg-kit/prebuilt/
+          asset_path: ${GITHUB_WORKSPACE}/Prebuilt.zip
           asset_name: Prebuilt.zip
           asset_content_type: application/octet-stream
 
