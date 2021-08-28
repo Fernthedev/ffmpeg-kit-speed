@@ -108,7 +108,7 @@ jobs:
           ./finalBuild.sh
 
       - name: The job has failed Build.log
-        if: ${{ failure() }}
+#        if: ${{ failure() }}
         run: |
           cat "ffmpeg-kit/build.log"
           ls ./ffmpeg-kit
@@ -159,6 +159,8 @@ jobs:
           ls
           echo other folder
           ls ./ffmpeg-kit
+          
+          ls ./ffmpeg-kit/prebuilt
 
       # Upload our release assets
       - name: Upload headers Release Asset
@@ -184,8 +186,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: |
-            ./ffmpeg-kit/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar
+          files: ./ffmpeg-kit/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar
       # - name: Upload non-debug artifact
       #   uses: actions/upload-artifact@v2
       #   with:
