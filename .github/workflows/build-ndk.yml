@@ -152,7 +152,7 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload prebuilt folder release Asset
-        id: upload_release_headers_asset
+        id: upload_release_folder_asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
