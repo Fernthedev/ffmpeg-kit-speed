@@ -158,9 +158,9 @@ jobs:
           
           ls
           echo other folder
-          ls ./ffmpeg-kit
+          ls ./ffmpeg-kit || true
           
-          ls ./ffmpeg-kit/prebuilt
+          ls ./ffmpeg-kit/prebuilt || true
 
       # Upload our release assets
       - name: Upload headers Release Asset
