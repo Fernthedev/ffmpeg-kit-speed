@@ -160,7 +160,7 @@ jobs:
           echo other folder
           ls ./ffmpeg-kit || true
           
-          ls ./ffmpeg-kit/prebuilt || true
+          ls ./prebuilt || true
 
       # Upload our release assets
       - name: Upload headers Release Asset
@@ -186,7 +186,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: ./ffmpeg-kit/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar
+          files: ./prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar
       # - name: Upload non-debug artifact
       #   uses: actions/upload-artifact@v2
       #   with:
