@@ -1,18 +1,16 @@
 diff --git a/android.sh b/android.sh
-index 787fd25..2eb9cd7 100755
+index 4d4e023..0f7a42d 100755
 --- a/android.sh
 +++ b/android.sh
-@@ -133,13 +133,17 @@ if [[ -z ${BUILD_VERSION} ]]; then
+@@ -150,13 +150,15 @@ if [[ -z ${BUILD_VERSION} ]]; then
    exit 1
  fi
  
 +export SKIP_openh264=1
-+
  # PROCESS FULL OPTION AS LAST OPTION
  if [[ -n ${BUILD_FULL} ]]; then
-   for library in {0..58}; do
+   for library in {0..61}; do
 -    if [ ${GPL_ENABLED} == "yes" ]; then
-+
 +    # 32 is OpenH264
 +    if [[ ${GPL_ENABLED} == "yes" && $library -ne 32 ]]; then
        enable_library "$(get_library_name $library)" 1
