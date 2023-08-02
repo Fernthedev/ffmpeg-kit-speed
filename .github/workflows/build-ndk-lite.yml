@@ -1,0 +1,197 @@
+name: NDK build
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    env:
+      module_id: mobile-ffmpeg
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+        with:
+          submodules: true
+          lfs: true
+          fetch-depth: "0"
+      - name: Cache Android and binaries
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/Android
+            ./mobile-ffmpeg/prebuilt
+          key: ${{ runner.os }}-android
+      # - name: Install Powershell
+      #   run: sudo apt-get install -y powershell
+
+      # - name: Cache Android NDK
+      #   id: cache-ndk
+      #   uses: actions/cache@v2
+      #   env:
+      #     cache-name: cache-ndk
+      #     ndkname: android-ndk-r21
+      #   with:
+      #     path: ndk
+      #     key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ env.cache-name }}-${{ env.ndkname }}
+
+      # - name: Install Android NDK
+      #   if: steps.cache-ndk.outputs.cache-hit != 'true'
+      #   env:
+      #     ndkname: android-ndk-r21
+      #   run: |
+      #     wget -q -O ndk.zip https://dl.google.com/android/repository/${ndkname}-linux-x86_64.zip
+      #     unzip -q ndk.zip
+      #     mv ${ndkname} ndk
+
+      # - name: Create ndkpath.txt
+      #   run: |
+      #     cd ndk
+      #     pwd > ${GITHUB_WORKSPACE}/ndkpath.txt
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Enable untrusted output
+        run: echo "::stop-commands::`echo -n ${{ github.token }} | sha256sum | head -c 64`"
+
+      #     - name: Cache QPM
+      #       id: cache-qpm
+      #       uses: actions/cache@v2
+      #       env:
+      #         cache-name: cache-qpm
+      #       with:
+      #         path: QPM
+      #         key: ${{ runner.os }}-${{ env.cache-name }}-2
+      #         restore-keys: |
+      #           ${{ runner.os }}-${{ env.cache-name }}-2
+
+      # - name: Get QPM
+      #   if: steps.cache-qpm.outputs.cache-hit != 'true'
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     github_token: ${{secrets.GITHUB_TOKEN}}
+      #     workflow: main.yml
+      #     name: QPM-ubuntu-x64
+      #     path: QPM
+      #     repo: sc2ad/QuestPackageManager
+
+      #     - name: QPM Dependencies Cache
+      #       id: cache-qpm-deps
+      #       uses: actions/cache@v2
+      #       env:
+      #         cache-name: cache-qpm-deps
+      #       with:
+      #         path: ~/.config/QPM
+      #         key: ${{ runner.os }}-${{ env.cache-name }}
+      #         restore-keys: |
+      #           ${{ runner.os }}-${{ env.cache-name }}
+
+      - name: Build
+        run: |
+          cd ${GITHUB_WORKSPACE}
+
+          # export ANDROID_HOME=~/.android/sdk
+          $ANDROID_HOME/tools/bin/sdkmanager --install "ndk;23.1.7779620" 2>&1 > /dev/null
+          export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/23.1.7779620
+
+          sudo apt install -y autotools-dev automake pkg-config autogen gperf autoconf libtool curl git cmake gcc gperf texinfo yasm nasm bison autogen wget autopoint meson ninja-build
+
+          pip3 install --user meson --upgrade
+
+          chmod +x ./finalBuild_lite.sh
+          ./finalBuild_lite.sh
+
+      - name: The job has failed Build.log
+#        if: ${{ failure() }}
+        run: |
+          cat "ffmpeg-kit/build.log"
+          ls ./ffmpeg-kit
+
+      - name: Get Tag Version
+        id: get_tag_version
+        run: |
+          echo ${GITHUB_REF#refs/tags/}
+          echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
+          echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
+
+      # Get release that was created for this tag
+      - name: Get Release
+        uses: octokit/request-action@v2.x
+        id: get_release
+        with:
+          route: GET /repos/:repository/releases/tags/${{ steps.get_tag_version.outputs.TAG }}
+          repository: ${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Release Upload URL
+        id: get_upload_url
+        run: |
+          url=$(echo "$response" | jq -r '.upload_url')
+          echo $url
+          echo "::set-output name=upload_url::$url"
+        env:
+          response: ${{ steps.get_release.outputs.data }}
+          
+      - name: Zip
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          
+          sudo apt install zip
+          
+          echo header zip
+          rm -rf ./include
+          mv ./ffmpeg-kit/prebuilt/android-arm64/ffmpeg/include ./include
+          zip -r ffmpeg-kit-lite-headers.zip ./include
+
+          
+          echo prebuilt zip
+          rm -rf ./prebuilt
+          mv ./ffmpeg-kit/prebuilt/ ./prebuilt
+          zip -r Prebuilt-lite.zip ./prebuilt/
+          
+          ls
+          echo other folder
+          ls ./ffmpeg-kit || true
+          
+          ls ./prebuilt || true
+
+          mv ./prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar ./ffmpeg-kit-lite.aar
+
+      # Upload our release assets
+      - name: Upload headers Release Asset
+        id: upload_release_headers_asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ./ffmpeg-kit-lite-headers.zip
+
+      - name: Upload prebuilt folder release Asset
+        id: upload_release_folder_asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ./Prebuilt-lite.zip.zip
+
+      # Upload our release assets
+      - name: Upload libraries Release Asset
+        id: upload_release_libraries_asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ./ffmpeg-kit-lite.aar
+      # - name: Upload non-debug artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: Prebuilt directory
+      #     path: ./ffmpeg-kit/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar
+      #     if-no-files-found: error
