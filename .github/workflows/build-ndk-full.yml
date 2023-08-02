@@ -108,7 +108,8 @@ jobs:
           ./finalBuild.sh
 
       - name: The job has failed Build.log
-#        if: ${{ failure() }}
+        if: ${{ always() }}
+        continue-on-error: true
         run: |
           cat "ffmpeg-kit/build.log"
           ls ./ffmpeg-kit
