@@ -101,7 +101,10 @@ jobs:
           export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/25.2.9519653
 
           sudo apt update
-          sudo apt install -y autotools-dev automake pkg-config autogen gperf autoconf libtool curl git cmake gcc gperf texinfo yasm nasm bison autogen wget autopoint meson ninja-build
+          sudo apt install -y autotools-dev automake pkg-config autogen gperf autoconf libtool curl git gcc gperf texinfo yasm nasm bison autogen wget autopoint meson ninja-build
+
+          sudo apt remove cmake -y
+          pip3 install cmake --upgrade
 
           pip3 install --user meson --upgrade
 
