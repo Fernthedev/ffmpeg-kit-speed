@@ -100,6 +100,7 @@ jobs:
           $ANDROID_HOME/tools/bin/sdkmanager --install "ndk;23.1.7779620" 2>&1 > /dev/null
           export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/23.1.7779620
 
+          sudo apt update
           sudo apt install -y autotools-dev automake pkg-config autogen gperf autoconf libtool curl git cmake gcc gperf texinfo yasm nasm bison autogen wget autopoint meson ninja-build
 
           pip3 install --user meson --upgrade
