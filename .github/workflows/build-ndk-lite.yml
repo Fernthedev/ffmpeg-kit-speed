@@ -108,6 +108,8 @@ jobs:
 
           pip3 install --user meson --upgrade
 
+          cmake --version
+
           chmod +x ./finalBuild_lite.sh
           ./finalBuild_lite.sh
 
