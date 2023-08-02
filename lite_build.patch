@@ -1,22 +1,18 @@
-diff --git a/android.sh b/android.sh
-index bf94df5..401daa3 100755
---- a/android.sh
-+++ b/android.sh
+diff --git a/scripts/android/ffmpeg.sh b/scripts/android/ffmpeg.sh
+index 8b311fd..5d01c4c 100755
+--- a/scripts/android/ffmpeg.sh
++++ b/scripts/android/ffmpeg.sh
 @@ -1,5 +1,7 @@
  #!/bin/bash
  
 +export SKIP_ffmpeg_kit=1
 +
- if [[ -z ${ANDROID_SDK_ROOT} ]]; then
-   echo -e "\n(*) ANDROID_SDK_ROOT not defined\n"
-   exit 1
-diff --git a/scripts/android/ffmpeg.sh b/scripts/android/ffmpeg.sh
-index 1ee0277..c0074df 100755
---- a/scripts/android/ffmpeg.sh
-+++ b/scripts/android/ffmpeg.sh
-@@ -394,14 +394,25 @@ fi
-   --nm="${NM}" \
-   --extra-libs="$(pkg-config --libs --static cpu-features)" \
+ HOST_PKG_CONFIG_PATH=$(command -v pkg-config)
+ if [ -z "${HOST_PKG_CONFIG_PATH}" ]; then
+   echo -e "\n(*) pkg-config command not found\n"
+@@ -423,6 +425,19 @@ fi
+   --arch="${TARGET_ARCH}" \
+   --cpu="${TARGET_CPU}" \
    --target-os=android \
 +  --disable-programs \
 +  --disable-doc \
@@ -32,12 +28,15 @@ index 1ee0277..c0074df 100755
 +  --enable-encoder=hevc \
 +  --enable-muxer=mp4 \
    ${ASM_OPTIONS} \
-   --enable-cross-compile \
+   --ar="${AR}" \
+   --cc="${CC}" \
+@@ -436,10 +451,8 @@ fi
    --enable-pic \
    --enable-jni \
    --enable-optimizations \
 -  --enable-swscale \
    ${BUILD_LIBRARY_OPTIONS} \
+   --enable-pthreads \
 -  --enable-v4l2-m2m \
    --disable-outdev=fbdev \
    --disable-indev=fbdev \
